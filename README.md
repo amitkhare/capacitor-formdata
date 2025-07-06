@@ -1,31 +1,26 @@
 # capacitor-formdata
 
-A Capacitor plugin that handles multipart form data uploads with image blobs to APIs. Solves the Android WebView limitation where standard fetch/axios fails to properly send multipart form data with image blobs.
+Capacitor plugin for multipart form data uploads with image blobs. Solves Android WebView limitations where standard fetch/axios fails to send form data with images.
 
-**Supported Platforms:** Android, Web
+**Platforms:** Android, Web
 
-## Problem This Solves
+## Problem
 
-On Android, the Capacitor WebView has issues with sending multipart form data containing image blobs using standard JavaScript fetch/axios. The form data arrives empty at the server. This plugin bypasses the WebView limitation by handling the HTTP request natively on Android while maintaining compatibility with web platforms.
+Android WebView cannot properly send multipart form data with image blobs using fetch/axios - the form data arrives empty at the server.
 
-## Features
+## Solution
 
-- ✅ Send multipart form data with image blobs
-- ✅ Support for authorization headers (Bearer tokens)
-- ✅ Custom headers support
-- ✅ Multiple form fields (text, images, objects)
-- ✅ Proper file handling with MIME types
-- ✅ Configurable timeouts
-- ✅ Works on both Android and Web
+This plugin uses native HTTP clients to bypass WebView limitations while maintaining web compatibility.
 
 ## Install
 
+Local installation:
 ```bash
-npm install capacitor-formdata
+npm install file:path/to/capacitor-formdata
 npx cap sync
 ```
 
-## Quick Example
+## Usage
 
 ```typescript
 import { FormData } from 'capacitor-formdata';
@@ -33,64 +28,34 @@ import { FormData } from 'capacitor-formdata';
 const result = await FormData.uploadFormData({
   url: 'https://your-api.com/upload',
   headers: {
-    'Authorization': 'Bearer your-token-here'
+    'Authorization': 'Bearer your-token'
   },
   formData: {
-    'image': 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD...',
+    'image': imageBlob,           // Blob object or base64 data URL
     'title': 'My Upload',
-    'userId': '123'
+    'metadata': { userId: 123 }
   }
 });
 
 console.log('Status:', result.status);
-console.log('Response:', result.data);
+console.log('Data:', result.data);
 ```
 
-For more examples, see [USAGE.md](./USAGE.md)
+## Supported Data Types
+
+- **Images**: Blob objects or base64 data URLs (`data:image/jpeg;base64,...`)
+- **Text**: Strings and numbers
+- **Objects**: Automatically JSON stringified
 
 ## API
 
-<docgen-index>
+### uploadFormData(options)
 
-* [`echo(...)`](#echo)
-* [`uploadFormData(...)`](#uploadformdata)
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `url` | `string` | API endpoint URL |
+| `headers` | `object` | HTTP headers (optional) |
+| `formData` | `object` | Form fields data |
+| `timeout` | `number` | Request timeout in ms (default: 30000) |
 
-</docgen-index>
-
-<docgen-api>
-<!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
-
-### echo(...)
-
-```typescript
-echo(options: { value: string; }) => Promise<{ value: string; }>
-```
-
-Echo a value for testing purposes
-
-| Param         | Type                            |
-| ------------- | ------------------------------- |
-| **`options`** | <code>{ value: string; }</code> |
-
-**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
-
---------------------
-
-
-### uploadFormData(...)
-
-```typescript
-uploadFormData(options: { url: string; headers?: { [key: string]: string; } | undefined; formData: { [key: string]: any; }; timeout?: number | undefined; }) => Promise<{ status: number; statusText: string; headers: { [key: string]: string; }; data: any; }>
-```
-
-Upload multipart form data with image blobs to an API endpoint
-
-| Param         | Type                                                                                                                     | Description            |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------- |
-| **`options`** | <code>{ url: string; headers?: { [key: string]: string; }; formData: { [key: string]: any; }; timeout?: number; }</code> | - Upload configuration |
-
-**Returns:** <code>Promise&lt;{ status: number; statusText: string; headers: { [key: string]: string; }; data: any; }&gt;</code>
-
---------------------
-
-</docgen-api>
+**Returns:** `Promise<{ status, statusText, headers, data }>`
