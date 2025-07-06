@@ -27,6 +27,8 @@ export class FormDataWeb extends WebPlugin implements FormDataPlugin {
       for (const [key, value] of Object.entries(options.formData)) {
         if (value instanceof Blob) {
           formData.append(key, value);
+        } else if (value instanceof File) {
+          formData.append(key, value);
         } else if (typeof value === 'string' && value.startsWith('data:')) {
           // Handle base64 data URLs by converting to Blob
           const blob = this.dataUrlToBlob(value);

@@ -50,13 +50,16 @@ public class FormData {
             // Set content type
             connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
             
-            // Add custom headers
+            // Add custom headers (but don't override Content-Type)
             if (headers != null) {
                 Iterator<String> keys = headers.keys();
                 while (keys.hasNext()) {
                     String key = keys.next();
                     String value = headers.getString(key);
-                    connection.setRequestProperty(key, value);
+                    // Don't override Content-Type
+                    if (!"Content-Type".equalsIgnoreCase(key)) {
+                        connection.setRequestProperty(key, value);
+                    }
                 }
             }
             
